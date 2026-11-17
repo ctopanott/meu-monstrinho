@@ -10,10 +10,15 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
+
+      - name: Descompactar o app
+        run: |
+          if [ -f app.zip ]; then rm -rf app && unzip -o -q app.zip; fi
+          ls app/src/main
 
       - name: Preparar Java
         uses: actions/setup-java@v4
@@ -21,8 +26,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Preparar Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Conferir Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms" || true
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Preparar Gradle
         uses: gradle/actions/setup-gradle@v4
